@@ -56,7 +56,7 @@ function messages(message: { success?: string, error?: string }) {
   };
 }
 
-class DecoratorTest {
+class DecoratorMethod {
   @loader()
   @messages({
     error: 'Deu ruim :c',
@@ -70,12 +70,12 @@ class DecoratorTest {
 }
 
 const run = async () => {
-  const decoratorTest = new DecoratorTest();
-  console.log('\n\n\n######## success \n\n\n');
+  const decoratorTest = new DecoratorMethod();
+  console.log('\n\n\n######## success');
   await decoratorTest.asyncMethod(true);
 
   try {
-    console.log('\n\n\n######## error \n\n\n');
+    console.log('\n\n\n######## error');
     await decoratorTest.asyncMethod(false);
   } catch (error) {
     console.log('expected error');

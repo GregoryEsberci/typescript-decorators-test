@@ -36,13 +36,13 @@ class DecoratorAccessor {
   }
 }
 
-const test = new DecoratorAccessor();
+const decoratorAccessor = new DecoratorAccessor();
 
 /* eslint-disable no-unused-expressions */
 console.count('get');
-test.immutableValue;
+decoratorAccessor.immutableValue;
 console.count('get');
-test.immutableValue;
+decoratorAccessor.immutableValue;
 console.count('get');
-test.immutableValue;
+decoratorAccessor.immutableValue;
 /* eslint-enable no-unused-expressions */

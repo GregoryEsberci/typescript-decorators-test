@@ -7,7 +7,7 @@ Apenas alguns testes com decorators
 yarn start
 ```
 
-DECORATOR_TYPE = `method` | `accessor`
+DECORATOR_TYPE = `method` | `accessor` | `property`
 ```sh
 node dist/<DECORATOR_TYPE>.js
 ```

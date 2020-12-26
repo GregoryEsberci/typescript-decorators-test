@@ -70,13 +70,13 @@ class DecoratorMethod {
 }
 
 const run = async () => {
-  const decoratorTest = new DecoratorMethod();
+  const decoratorMethod = new DecoratorMethod();
   console.log('\n\n\n######## success');
-  await decoratorTest.asyncMethod(true);
+  await decoratorMethod.asyncMethod(true);
 
   try {
     console.log('\n\n\n######## error');
-    await decoratorTest.asyncMethod(false);
+    await decoratorMethod.asyncMethod(false);
   } catch (error) {
     console.log('expected error');
   }

@@ -1,13 +1,11 @@
-// TODO: Esse descriptor não funciona corretamente se existir um setter
-function cache(
+const cache = (
   target: any,
   propertyKey: string,
   descriptor: PropertyDescriptor,
-) {
+) => {
   const originalGetter = descriptor.get as () => any;
 
   descriptor.get = function () {
-    // Sobrescreve o atributo para não realizar mais o get
     Object.defineProperty(target, propertyKey, {
       value: originalGetter.apply(this),
       configurable: true,
@@ -16,7 +14,28 @@ function cache(
     });
     console.log('stored value');
   };
-}
+};
+
+// decorator factory
+const accessorSize = ({ min = -Infinity, max = Infinity }) => (
+  _target: Record<keyof any, any>,
+  propertyKey: string,
+  descriptor: PropertyDescriptor,
+) => {
+  // the decorator
+
+  const originalSetter = descriptor.set as (v: any) => any;
+
+  descriptor.set = (newVal: any) => {
+    if (newVal.length < min) {
+      console.error(`${propertyKey} deve ter mais de ${min} caracteres`);
+    } else if (newVal.length > max) {
+      console.error(`${propertyKey} deve ter menos de ${max} caracteres`);
+    } else {
+      originalSetter(newVal);
+    }
+  };
+};
 
 class DecoratorAccessor {
   veryHeavyProcess() {
@@ -34,6 +53,11 @@ class DecoratorAccessor {
   get immutableValue() {
     return this.veryHeavyProcess();
   }
+
+  @accessorSize({ min: 2 })
+  set sizeControlled(v: string) {
+    console.log('called setter sizeControlled', v);
+  }
 }
 
 const decoratorAccessor = new DecoratorAccessor();
@@ -46,3 +70,11 @@ decoratorAccessor.immutableValue;
 console.count('get');
 decoratorAccessor.immutableValue;
 /* eslint-enable no-unused-expressions */
+
+console.log('\n\n\n\n');
+console.log('set:', '.');
+decoratorAccessor.sizeControlled = '.';
+
+console.log();
+console.log('set:', 'agora sim');
+decoratorAccessor.sizeControlled = 'agora sim';

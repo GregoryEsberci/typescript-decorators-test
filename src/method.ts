@@ -12,52 +12,49 @@ const sleep = (t: number, result: 'resolve' | 'reject' = 'resolve') => (
   new Promise((resolve, reject) => setTimeout(result === 'resolve' ? resolve : reject, t))
 );
 
-function loader() {
-  return (
-    _target: any,
-    _propertyKey: string,
-    descriptor: TypedPropertyDescriptor<(...arg: any) => Promise<any>>,
-  ) => {
-    const originalMethod = descriptor.value;
+function loader(
+  _target: any,
+  _propertyKey: string,
+  descriptor: TypedPropertyDescriptor<(...arg: any) => Promise<any>>,
+) {
+  const originalMethod = descriptor.value;
 
-    if (!originalMethod) return;
+  if (!originalMethod) return;
 
-    descriptor.value = async function (...args) {
-      loaderService.show();
+  descriptor.value = async function (...args) {
+    loaderService.show();
 
-      try {
-        await originalMethod.apply(this, args);
-      } finally {
-        loaderService.hidden();
-      }
-    };
+    try {
+      return await originalMethod.apply(this, args);
+    } finally {
+      loaderService.hidden();
+    }
   };
 }
 
-function messages(message: { success?: string, error?: string }) {
-  return (
-    _target: any,
-    _propertyKey: string,
-    descriptor: TypedPropertyDescriptor<(...arg: any) => Promise<any>>,
-  ) => {
-    const originalMethod = descriptor.value;
+const messages = (message: { success?: string, error?: string }) => (
+  _target: any,
+  _propertyKey: string,
+  descriptor: TypedPropertyDescriptor<(...arg: any) => Promise<any>>,
+) => {
+  const originalMethod = descriptor.value;
 
-    if (!originalMethod) return;
+  if (!originalMethod) return;
 
-    descriptor.value = async function (...args) {
-      try {
-        await originalMethod.apply(this, args);
-        if (message.success) messageService.success(message.success);
-      } catch (e) {
-        if (message.error) messageService.error(message.error);
-        throw e;
-      }
-    };
+  descriptor.value = async function (...args) {
+    try {
+      const originalReturn = await originalMethod.apply(this, args);
+      if (message.success) messageService.success(message.success);
+      return originalReturn;
+    } catch (e) {
+      if (message.error) messageService.error(message.error);
+      throw e;
+    }
   };
-}
+};
 
 class DecoratorMethod {
-  @loader()
+  @loader
   @messages({
     error: 'Deu ruim :c',
     success: 'Deu boa :D',
@@ -65,7 +62,7 @@ class DecoratorMethod {
   async asyncMethod(success: boolean) {
     console.log('start method');
     await sleep(1000, success ? 'resolve' : 'reject');
-    console.log('\nend method');
+    console.log('end method');
   }
 }
 
